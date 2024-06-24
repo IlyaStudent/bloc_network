@@ -1,5 +1,6 @@
 import 'package:bloc_network/features/home_screen/data/repository/users_repository.dart';
 import 'package:bloc_network/features/home_screen/presentation/bloc/user_bloc.dart';
+import 'package:bloc_network/features/home_screen/presentation/cubit/internet_cibit.dart';
 import 'package:bloc_network/features/home_screen/presentation/widgets/action_buttons.dart';
 import 'package:bloc_network/features/home_screen/presentation/widgets/user_list.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UserBloc(userRepositiry: userRepositiry),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => UserBloc(userRepositiry: userRepositiry),
+        ),
+        BlocProvider(create: (context) => ConnectionCubit()),
+      ],
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("User list"),
+          title: BlocBuilder<ConnectionCubit, MyConnectionState>(
+            builder: (context, state) => state.connected
+                ? const Text("В сети")
+                : const Text(
+                    "Нет соединения с интернетом",
+                    style: TextStyle(color: Colors.red),
+                  ),
+          ),
           centerTitle: true,
           backgroundColor: Colors.white,
         ),
